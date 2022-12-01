@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/listNote">
+
+    <fragment
+        android:id="@+id/createNote"
+        android:name="com.cesar.notasytareas.CreateNote"
+        android:label="fragment_create_note"
+        tools:layout="@layout/fragment_create_note">
+        <action
+            android:id="@+id/action_createNote_to_listNote"
+            app:destination="@id/listNote" />
+        <action
+            android:id="@+id/action_createNote_to_listFotos"
+            app:destination="@id/listFotos" />
+    </fragment>
+    <fragment
+        android:id="@+id/listNote"
+        android:name="com.cesar.notasytareas.ListNote"
+        android:label="fragment_list_note"
+        tools:layout="@layout/fragment_list_note">
+        <action
+            android:id="@+id/action_listNote_to_createNote"
+            app:destination="@id/createNote" />
+    </fragment>
+    <fragment
+        android:id="@+id/listFotos"
+        android:name="com.cesar.notasytareas.ListFotos"
+        android:label="fragment_list_fotos"
+        tools:layout="@layout/fragment_list_fotos" >
+        <action
+            android:id="@+id/action_listFotos_to_foto"
+            app:destination="@id/foto" />
+        <action
+            android:id="@+id/action_listFotos_to_video"
+            app:destination="@id/video" />
+        <action
+            android:id="@+id/action_listFotos_to_addAudio"
+            app:destination="@id/addAudio" />
+    </fragment>
+    <fragment
+        android:id="@+id/foto"
+        android:name="com.cesar.notasytareas.Foto"
+        android:label="fragment_foto"
+        tools:layout="@layout/fragment_foto" >
+        <action
+            android:id="@+id/action_foto_to_listFotos"
+            app:destination="@id/listFotos" />
+    </fragment>
+    <fragment
+        android:id="@+id/video"
+        android:name="com.cesar.notasytareas.Video"
+        android:label="fragment_video"
+        tools:layout="@layout/fragment_video" >
+        <action
+            android:id="@+id/action_video_to_listFotos"
+            app:destination="@id/listFotos" />
+    </fragment>
+    <fragment
+        android:id="@+id/addAudio"
+        android:name="com.cesar.notasytareas.AddAudio"
+        android:label="fragment_add_audio"
+        tools:layout="@layout/fragment_add_audio" >
+        <action
+            android:id="@+id/action_addAudio_to_listFotos"
+            app:destination="@id/listFotos" />
+    </fragment>
+</navigation>

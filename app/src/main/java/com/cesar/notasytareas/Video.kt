@@ -1,8 +1,10 @@
 package com.cesar.notasytareas
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
@@ -10,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.MediaController
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
@@ -28,7 +31,7 @@ import java.util.*
 class Video : Fragment() {
     private val REQUEST_TAKE_VIDEO: Int = 1001
     lateinit var miContexto: Context
-    lateinit var photoURI: Uri
+    var photoURI: Uri="".toUri()
     lateinit var binding : FragmentVideoBinding
     lateinit var currentPhotoPath: String
     lateinit var mediaController: MediaController
@@ -100,6 +103,20 @@ class Video : Fragment() {
                 }
             }
         }
+        binding.btnGaleriaVideo.setOnClickListener {
+            val intent: Intent
+            if (Build.VERSION.SDK_INT < 19) {
+                intent = Intent()
+                intent.setAction(Intent.ACTION_GET_CONTENT)
+                intent.setType("video/*")
+                startActivityForResult(intent, 111)
+            } else {
+                intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+                intent.addCategory(Intent.CATEGORY_OPENABLE)
+                intent.setType("video/*")
+                startActivityForResult(intent, 111)
+            }
+        }
         return binding.root
     }
 
@@ -132,10 +149,29 @@ class Video : Fragment() {
     }
 
 
-
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_TAKE_VIDEO && resultCode == AppCompatActivity.RESULT_OK) {
+            binding.videoView.setVideoURI(photoURI)
+            binding.videoView.start()
+            binding.videoView.setOnClickListener { binding.videoView.start() }
+            binding.btnGuardarVideo.visibility=View.VISIBLE
+        }else if (requestCode == 111 && resultCode == Activity.RESULT_OK) {
+
+            miContexto.grantUriPermission(miContexto.packageName,photoURI,Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            data?.data?.also { uri ->
+
+                val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+
+                photoURI=uri
+                // Check for the freshest data.
+                miContexto.contentResolver.takePersistableUriPermission(photoURI, takeFlags)
+                // you can get uri and perform any function on it
+                // Perform operations on the document using its URI.
+            }
+
             binding.videoView.setVideoURI(photoURI)
             binding.videoView.start()
             binding.videoView.setOnClickListener { binding.videoView.start() }

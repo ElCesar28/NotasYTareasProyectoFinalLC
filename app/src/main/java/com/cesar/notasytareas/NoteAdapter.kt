@@ -77,7 +77,7 @@ class NoteAdapter(var notes: List<Note>): RecyclerView.Adapter<NoteAdapter.ViewH
         }
 
 
-        holder.btn_edit.setOnClickListener{ view : View ->
+        holder.item.setOnClickListener{ view : View ->
             var bundle = Bundle()
             bundle.putString("id",p.id.toString())
             bundle.putString("title", p.title)

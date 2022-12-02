@@ -40,6 +40,10 @@
         <action
             android:id="@+id/action_listFotos_to_addAudio"
             app:destination="@id/addAudio" />
+        <action
+            android:id="@+id/action_listFotos_to_listNote"
+            app:destination="@id/listNote"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/foto"
@@ -48,7 +52,8 @@
         tools:layout="@layout/fragment_foto" >
         <action
             android:id="@+id/action_foto_to_listFotos"
-            app:destination="@id/listFotos" />
+            app:destination="@id/listFotos"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/video"

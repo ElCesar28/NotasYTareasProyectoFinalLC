@@ -1,16 +1,17 @@
 package com.cesar.notasytareas
 
+import android.R.attr
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.MediaController
-import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
@@ -19,18 +20,18 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.cesar.notasytareas.data.NoteDatabase
 import com.cesar.notasytareas.databinding.FragmentFotoBinding
-import java.util.*
 import com.cesar.notasytareas.model.Multimedia
-import com.cesar.notasytareas.model.Note
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
+import java.util.*
+
 
 class Foto : Fragment() {
-    lateinit var miContexto:Context
-    lateinit var photoURI: Uri
-    lateinit var binding : FragmentFotoBinding
+    lateinit var miContexto: Context
+    var photoURI: Uri="".toUri()
+    lateinit var binding: FragmentFotoBinding
     lateinit var currentPhotoPath: String
 
     override fun onAttach(context: Context) {
@@ -44,7 +45,7 @@ class Foto : Fragment() {
     ): View? {
 
         val bundle = Bundle()
-
+        Intent.FLAG_GRANT_READ_URI_PERMISSION
         //Inicializamos el bindig e inflamos el fragmento
         binding = FragmentFotoBinding.inflate(layoutInflater)
 
@@ -59,8 +60,6 @@ class Foto : Fragment() {
         }
 
         if(arguments?.getString("path")!= null){
-            Toast.makeText(context, "Hay foto", Toast.LENGTH_SHORT).show()
-
             binding.imgFotoTomada.setImageURI(arguments?.getString("path")!!.toUri())
             binding.descriptionMultimedia.setText(arguments?.getString("description"))
             binding.btnTomarFoto.visibility=View.INVISIBLE
@@ -81,7 +80,6 @@ class Foto : Fragment() {
                 }
             }
         }else{
-            Toast.makeText(context, "No hay foto :3", Toast.LENGTH_SHORT).show()
 
             binding.btnGuardar.setOnClickListener {
                 bundle.putString("idNota",arguments?.getString("idNota"))
@@ -100,7 +98,20 @@ class Foto : Fragment() {
             }
         }
 
-
+        binding.btnGaleriaFoto.setOnClickListener {
+            val intent: Intent
+            if (Build.VERSION.SDK_INT < 19) {
+                intent = Intent()
+                intent.setAction(Intent.ACTION_GET_CONTENT)
+                intent.setType("image/*")
+                startActivityForResult(intent, 111)
+            } else {
+                intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+                intent.addCategory(Intent.CATEGORY_OPENABLE)
+                intent.setType("image/*")
+                startActivityForResult(intent, 111)
+            }
+        }
 
 
         return binding.root
@@ -135,9 +146,28 @@ class Foto : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == AppCompatActivity.RESULT_OK) {
+            binding.imgFotoTomada.setImageURI(photoURI)
+            binding.btnGuardar.visibility=View.VISIBLE
+        }else if (requestCode == 111 && resultCode == Activity.RESULT_OK) {
+
+            miContexto.grantUriPermission(miContexto.packageName,photoURI,Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            data?.data?.also { uri ->
+
+                val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+
+                photoURI=uri
+                // Check for the freshest data.
+                miContexto.contentResolver.takePersistableUriPermission(photoURI, takeFlags)
+                // you can get uri and perform any function on it
+                // Perform operations on the document using its URI.
+            }
+
+
             binding.imgFotoTomada.setImageURI(photoURI)
             binding.btnGuardar.visibility=View.VISIBLE
         }
@@ -152,7 +182,7 @@ class Foto : Fragment() {
         val storageDir: File? = activity?.getExternalFilesDir(null)
         return File.createTempFile(
             "foto_${timeStamp}_", /* prefix */
-            ".jpg", /* suffix */
+            ".png", /* suffix */
             storageDir /* directory */
         ).apply {
             // Save a file: path for use with ACTION_VIEW intents
@@ -160,28 +190,5 @@ class Foto : Fragment() {
         }
     }
 
-    private fun setPic() {
-        // Get the dimensions of the View
-        val targetH: Int = binding.imgFotoTomada.width
-        val targetW: Int = binding.imgFotoTomada.height
 
-        val bmOptions = BitmapFactory.Options().apply {
-            // Get the dimensions of the bitmap
-            inJustDecodeBounds = true
-
-            val photoW: Int = outWidth
-            val photoH: Int = outHeight
-
-            // Determine how much to scale down the image
-            val scaleFactor: Int = Math.min( photoH / targetH,photoW / targetW)
-
-            // Decode the image file into a Bitmap sized to fill the View
-            inJustDecodeBounds = false
-            inSampleSize = scaleFactor
-            inPurgeable = true
-        }
-        BitmapFactory.decodeFile(currentPhotoPath, bmOptions)?.also { bitmap ->
-            binding.imgFotoTomada.setImageBitmap(bitmap)
-        }
-    }
 }

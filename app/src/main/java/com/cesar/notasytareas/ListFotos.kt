@@ -52,6 +52,9 @@ class ListFotos: Fragment() {
         root.findViewById<ImageView>(R.id.imgMicro).setOnClickListener {
             view?.findNavController()?.navigate(R.id.action_listFotos_to_addAudio,bundle)
         }
+        root.findViewById<ImageView>(R.id.imgHome).setOnClickListener {
+            view?.findNavController()?.navigate(R.id.action_listFotos_to_listNote,bundle)
+        }
         return root.rootView
     }
 }

@@ -10,7 +10,7 @@ import com.cesar.notasytareas.model.Note
 interface NoteDao {
 
     @Insert
-    fun insert(note: Note)
+    fun insert(note: Note):Long
 
     @Query("SELECT * FROM Note ORDER BY type DESC")
     fun getAllNotes(): List<Note>

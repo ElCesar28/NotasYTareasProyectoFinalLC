@@ -1,5 +1,6 @@
 package com.cesar.notasytareas
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -31,6 +32,7 @@ class MultimediaAdapter (var multimedia: List<Multimedia>): RecyclerView.Adapter
             btnDelete = v.findViewById(R.id.btnDeleteMultimedia)
             description = v.findViewById(R.id.lblDescripcion)
             cardview = v.findViewById(R.id.cardView)
+
         }
 
     }
@@ -50,7 +52,7 @@ class MultimediaAdapter (var multimedia: List<Multimedia>): RecyclerView.Adapter
         }else if(p.type == 2){
             holder.foto.setImageResource(R.drawable.videomultimedia)
         }else if(p.type == 3){
-
+            holder.foto.setImageResource(R.drawable.audiomultimedia)
         }
         holder.description.text=p.description
 

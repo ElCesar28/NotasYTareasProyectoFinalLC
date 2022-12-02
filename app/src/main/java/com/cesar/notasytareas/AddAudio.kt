@@ -16,12 +16,17 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import com.cesar.notasytareas.data.NoteDatabase
 import com.cesar.notasytareas.databinding.FragmentAddAudioBinding
 import com.cesar.notasytareas.databinding.FragmentFotoBinding
+import com.cesar.notasytareas.model.Multimedia
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -40,6 +45,7 @@ class AddAudio : Fragment() {
     private var player: MediaPlayer? = null
     lateinit var miContexto: Context
     lateinit var binding : FragmentAddAudioBinding
+    private var audio:String=""
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -58,9 +64,69 @@ class AddAudio : Fragment() {
 
         iniPerm()
 
-        binding.addAudioCancel.setOnClickListener {
-            it.findNavController().navigate(R.id.action_addAudio_to_listFotos)
+        if(arguments?.getString("path")!= null){
+
+            fileName= arguments?.getString("path")!!
+            binding.addAudioTitle.setText(arguments?.getString("description"))
+            binding.addAudioGrabar.visibility=View.INVISIBLE
+
+            bundle.putString("idNota",arguments?.getString("idNota"))
+            bundle.putString("type","3")
+            bundle.putString("path",arguments?.getString("path"))
+            bundle.putString("description",binding.addAudioTitle.text.toString())
+
+            onPlay(mStartPlaying)
+            if (fileName.length > 0) {
+                when (mStartPlaying) {
+                    true -> Toast.makeText(context, "Parando"+fileName, Toast.LENGTH_SHORT).show()
+                    false -> Toast.makeText(context, "Reproduciendo"+fileName, Toast.LENGTH_SHORT).show()
+                }
+                mStartPlaying = !mStartPlaying
+            } else {
+                Toast.makeText(
+                    context,
+                    "Debes grabar un audio" + fileName,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            binding.addAudioGuardar.setOnClickListener {
+                lifecycleScope.launch{
+                    NoteDatabase.getDatabase(requireActivity().applicationContext).multimediaDao()
+                        .updateMultimedia(arguments?.getString("path").toString(),
+                            binding.addAudioTitle.text.toString(),
+                            arguments?.getString("id")!!.toInt())
+                    it.findNavController().navigate(R.id.action_addAudio_to_listFotos,bundle)
+                }
+            }
+        }else{
+            binding.addAudioGuardar.setOnClickListener {
+                bundle.putString("idNota",arguments?.getString("idNota"))
+                bundle.putString("type","3")
+                bundle.putString("path",fileName)
+                bundle.putString("description",binding.addAudioTitle.text.toString())
+
+                if (fileName.length > 0) {
+                    lifecycleScope.launch {
+                        val audio = Multimedia( arguments?.getString("idNota")!!.toInt(),
+                            3,
+                            fileName,
+                            binding.addAudioTitle.text.toString())
+                        NoteDatabase.getDatabase(requireActivity().applicationContext).multimediaDao().insert(audio)
+                        it.findNavController().navigate(R.id.action_addAudio_to_listFotos,bundle)
+                    }
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Debes grabar un audio" + fileName,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+            }
+
         }
+
         binding.addAudioGrabar.setOnClickListener {
             grabar()
             grabando(mStartRecording)
@@ -95,29 +161,16 @@ class AddAudio : Fragment() {
 
         }
 
-        binding.addAudioGuardar.setOnClickListener {
-            if (fileName.length > 0) {
-                Toast.makeText(
-                    context,
-                    "El archivo esta en " + uri.path,
-                    Toast.LENGTH_SHORT
 
-                ).show()
-            } else {
-                Toast.makeText(
-                    context,
-                    "Debes grabar un audio" + fileName,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-        binding.addAudioSeleccionar.setOnClickListener {
-            val intent = Intent()
-                .setType("audio/*")
-                .setAction(Intent.ACTION_GET_CONTENT)
-            startActivityForResult(Intent.createChooser(intent, "Select a file"), 111)
-        }
+        //binding.addAudioSeleccionar.setOnClickListener {
+        //    val intent = Intent()
+        //        .setType("audio/*")
+        //        .setAction(Intent.ACTION_GET_CONTENT)
+        //    startActivityForResult(Intent.createChooser(intent, "Select a file"), 111)
+        //}
         return binding.root
+
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -312,11 +365,12 @@ class AddAudio : Fragment() {
     private fun startPlaying() {
         player = MediaPlayer().apply {
             try {
+
                 uri=Uri.parse(fileName)
                 setDataSource(uri.path)
                 prepare()
                 start()
-                Toast.makeText(context, uri.toString(), Toast.LENGTH_SHORT).show()
+
             } catch (e: IOException) {
                 Log.e(LOG_TAG, "prepare() failed")
             }

@@ -83,8 +83,6 @@ class CreateNote : Fragment() {
         if(id!=-1){
             toggle.visibility = View.INVISIBLE
             bundle.putString("idNota",id.toString())
-        }else{
-            binding.floatingActionButton.visibility=View.INVISIBLE
         }
 
         //Listeners para imgs y botones
@@ -106,7 +104,6 @@ class CreateNote : Fragment() {
                             getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss"),
                             completada)
                         NoteDatabase.getDatabase(requireActivity().applicationContext).noteDao().insert(newNote)
-                        NoteDatabase.getDatabase(requireActivity().applicationContext).noteDao().getAllNotes()
 
                     }else{
                         //Insert new note
@@ -116,7 +113,6 @@ class CreateNote : Fragment() {
                             getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss"),
                             completada)
                         NoteDatabase.getDatabase(requireActivity().applicationContext).noteDao().insert(newNote)
-                        NoteDatabase.getDatabase(requireActivity().applicationContext).noteDao().getAllNotes()
                     }
 
                 } else {
@@ -131,7 +127,6 @@ class CreateNote : Fragment() {
                                 completada,
                                 id
                             )
-                        NoteDatabase.getDatabase(requireActivity().applicationContext).noteDao().getAllNotes()
                     }else{
                         //update note
                         NoteDatabase.getDatabase(requireActivity().applicationContext)
@@ -141,7 +136,6 @@ class CreateNote : Fragment() {
                                 getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss"),
                                 id
                             )
-                        NoteDatabase.getDatabase(requireActivity().applicationContext).noteDao().getAllNotes()
                     }
                 }
 
@@ -157,7 +151,35 @@ class CreateNote : Fragment() {
         }
 
         binding.floatingActionButton.setOnClickListener{
-            it.findNavController().navigate(R.id.action_createNote_to_listFotos,bundle)//pasar aqui el bundle
+            if(arguments?.getString("id") != null){
+                it.findNavController().navigate(R.id.action_createNote_to_listFotos,bundle)
+            }else{
+                var idAutoInsert=0
+                lifecycleScope.launch{
+                    if(typeNote){
+                        //Insert new task
+                        val newNote = Note( binding.title.text.toString(),
+                            binding.description.text.toString(),
+                            typeNote,
+                            getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss"),
+                            completada)
+                        idAutoInsert= NoteDatabase.getDatabase(requireActivity().applicationContext).noteDao().insert(newNote).toInt()
+
+                    }else{
+                        //Insert new note
+                        val newNote = Note( binding.title.text.toString(),
+                            binding.description.text.toString(),
+                            typeNote,
+                            getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss"),
+                            completada)
+                        idAutoInsert= NoteDatabase.getDatabase(requireActivity().applicationContext).noteDao().insert(newNote).toInt()
+                    }
+
+                    bundle.putString("idNota",idAutoInsert.toString())
+                    it.findNavController().navigate(R.id.action_createNote_to_listFotos,bundle)
+                }
+
+            }
         }
 
 

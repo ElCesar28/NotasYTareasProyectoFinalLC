@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_createNote_to_listFotos"
             app:destination="@id/listFotos" />
+        <action
+            android:id="@+id/action_createNote_to_recordatorios"
+            app:destination="@id/recordatorios" />
     </fragment>
     <fragment
         android:id="@+id/listNote"
@@ -73,4 +76,9 @@
             android:id="@+id/action_addAudio_to_listFotos"
             app:destination="@id/listFotos" />
     </fragment>
+    <fragment
+        android:id="@+id/recordatorios"
+        android:name="com.cesar.notasytareas.Recordatorios"
+        android:label="fragment_recordatorios"
+        tools:layout="@layout/fragment_recordatorios" />
 </navigation>

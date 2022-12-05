@@ -22,6 +22,8 @@ import java.util.*
 
 class CreateNote : Fragment() {
 
+    private var idNote: Int = -1
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -72,13 +74,10 @@ class CreateNote : Fragment() {
         fun getCurrentDateTime(): Date { return Calendar.getInstance().time }
 
 
-        //edit
-        var id = -1
-
         if(arguments?.getString("title") != null) {
             binding.title.setText(arguments?.getString("title"))
             binding.description.setText(arguments?.getString("description"))
-            id = arguments?.getString("id")!!.toInt()
+            idNote = arguments?.getString("id")!!.toInt()
         }
         if(id!=-1){
             toggle.visibility = View.INVISIBLE
@@ -95,7 +94,7 @@ class CreateNote : Fragment() {
 
             //Insert
             lifecycleScope.launch{
-                if (id == -1){
+                if (idNote == -1){
                     if(typeNote){
                         //Insert new task
                         val newNote = Note( binding.title.text.toString(),
@@ -125,7 +124,7 @@ class CreateNote : Fragment() {
                                 binding.description.text.toString(),
                                 getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss"),
                                 completada,
-                                id
+                                idNote
                             )
                     }else{
                         //update note
@@ -134,7 +133,7 @@ class CreateNote : Fragment() {
                                 binding.title.text.toString(),
                                 binding.description.text.toString(),
                                 getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss"),
-                                id
+                                idNote
                             )
                     }
                 }
@@ -177,6 +176,40 @@ class CreateNote : Fragment() {
 
                     bundle.putString("idNota",idAutoInsert.toString())
                     it.findNavController().navigate(R.id.action_createNote_to_listFotos,bundle)
+                }
+
+            }
+        }
+
+        binding.btnReminders.setOnClickListener{
+            if(arguments?.getString("id") != null){
+
+                bundle.putString("tittle",binding.title.text.toString())
+                it.findNavController().navigate(R.id.action_createNote_to_recordatorios,bundle)
+            }else{
+                var idAutoInsert=0
+                lifecycleScope.launch{
+                    if(typeNote){
+                        //Insert new task
+                        val newNote = Note( binding.title.text.toString(),
+                            binding.description.text.toString(),
+                            typeNote,
+                            getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss"),
+                            completada)
+                        idAutoInsert= NoteDatabase.getDatabase(requireActivity().applicationContext).noteDao().insert(newNote).toInt()
+
+                    }else{
+                        //Insert new note
+                        val newNote = Note( binding.title.text.toString(),
+                            binding.description.text.toString(),
+                            typeNote,
+                            getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss"),
+                            completada)
+                        idAutoInsert= NoteDatabase.getDatabase(requireActivity().applicationContext).noteDao().insert(newNote).toInt()
+                    }
+
+                    bundle.putString("tittle",binding.title.text.toString())
+                    it.findNavController().navigate(R.id.action_createNote_to_recordatorios,bundle)
                 }
 
             }

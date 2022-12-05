@@ -79,9 +79,9 @@ class CreateNote : Fragment() {
             binding.description.setText(arguments?.getString("description"))
             idNote = arguments?.getString("id")!!.toInt()
         }
-        if(id!=-1){
+        if(idNote!=-1){
             toggle.visibility = View.INVISIBLE
-            bundle.putString("idNota",id.toString())
+            bundle.putString("idNota",idNote.toString())
         }
 
         //Listeners para imgs y botones

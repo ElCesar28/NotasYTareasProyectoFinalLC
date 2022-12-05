@@ -60,7 +60,6 @@ class Video : Fragment() {
         }
 
         if(arguments?.getString("path")!= null){
-            Toast.makeText(context, "Hay video", Toast.LENGTH_SHORT).show()
 
             binding.videoView.setVideoURI(arguments?.getString("path")!!.toUri())
             binding.videoView.start()

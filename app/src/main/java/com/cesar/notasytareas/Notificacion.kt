@@ -39,12 +39,11 @@ class Notificacion (base: Context) : ContextWrapper(base) {
         return manager as NotificationManager
     }
 
-    fun getNotificationBuilder(titulo:String): NotificationCompat.Builder {
+    fun getNotificationBuilder(titulo:String,descripcion:String): NotificationCompat.Builder {
         val intent = Intent(this, CreateNote::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         //val pendingIntent = PendingIntent.getActivity(this, notificationID, intent, 0)
-
         var pendingIntent: PendingIntent? = null
         pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PendingIntent.getActivity(this, notificationID, intent,PendingIntent.FLAG_MUTABLE)
@@ -52,12 +51,13 @@ class Notificacion (base: Context) : ContextWrapper(base) {
             PendingIntent.getActivity(this,  notificationID, intent,PendingIntent.FLAG_ONE_SHOT)
         }
         return NotificationCompat.Builder(applicationContext, MYCHANNEL_ID)
-            .setContentTitle(titulo)
-            .setContentText("Tienes una tarea pendiente")
+            .setContentTitle("$titulo")
+            .setContentText("$descripcion")
             .setSmallIcon(R.drawable.remind)
             .setColor(Color.YELLOW)
             .setContentIntent(pendingIntent)
             .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
             .setAutoCancel(true)
     }
+
 }

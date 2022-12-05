@@ -11,9 +11,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import com.cesar.notasytareas.databinding.FragmentRecordatoriosBinding
 import java.text.SimpleDateFormat
 import java.util.*
@@ -42,7 +44,6 @@ class Recordatorios : Fragment() {
         binding.title.setText(arguments?.getString("tittle"))
 
         val bundle = Bundle()
-        val currentTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
 
         //Date and hour
         binding.date.setOnClickListener {
@@ -56,6 +57,8 @@ class Recordatorios : Fragment() {
         binding.saveAlarma.setOnClickListener {
 
             scheduleNotification(binding.title.text.toString(),binding.description.text.toString())
+            Toast.makeText(context, "Alarma guardada con éxito", Toast.LENGTH_SHORT).show()
+            it.findNavController().navigate(R.id.action_recordatorios_to_listNote)
         }
 
 
@@ -98,10 +101,16 @@ class Recordatorios : Fragment() {
     private fun startAlarm(calendar: Calendar, titulo: String, descripcion:String) {
         val alarmManager = activity?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, Receiver::class.java)
-        //val message = "Tienes esta tarea pendiente"
         intent.putExtra(tituloExtra2, titulo)
         intent.putExtra(mensajeExtra2, descripcion)
-        val pendingIntent = PendingIntent.getBroadcast(context, notificationID, intent, 0)
+        //val pendingIntent = PendingIntent.getBroadcast(context, notificationID, intent, 0)
+
+        var pendingIntent: PendingIntent? = null
+        pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PendingIntent.getBroadcast(context, notificationID, intent,PendingIntent.FLAG_MUTABLE)
+        } else {
+            PendingIntent.getBroadcast(context,  notificationID, intent,PendingIntent.FLAG_ONE_SHOT)
+        }
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
     }
 

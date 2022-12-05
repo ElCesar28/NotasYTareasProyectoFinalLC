@@ -78,8 +78,8 @@ class AddAudio : Fragment() {
             onPlay(mStartPlaying)
             if (fileName.length > 0) {
                 when (mStartPlaying) {
-                    true -> Toast.makeText(context, "Parando"+fileName, Toast.LENGTH_SHORT).show()
-                    false -> Toast.makeText(context, "Reproduciendo"+fileName, Toast.LENGTH_SHORT).show()
+                    true -> Toast.makeText(context, "Parando", Toast.LENGTH_SHORT).show()
+                    false -> Toast.makeText(context, "Reproduciendo", Toast.LENGTH_SHORT).show()
                 }
                 mStartPlaying = !mStartPlaying
             } else {
@@ -147,8 +147,8 @@ class AddAudio : Fragment() {
             onPlay(mStartPlaying)
             if (fileName.length > 0) {
                 when (mStartPlaying) {
-                    true -> Toast.makeText(context, "Parando"+fileName, Toast.LENGTH_SHORT).show()
-                    false -> Toast.makeText(context, "Reproduciendo"+fileName, Toast.LENGTH_SHORT).show()
+                    true -> Toast.makeText(context, "Parando", Toast.LENGTH_SHORT).show()
+                    false -> Toast.makeText(context, "Reproduciendo", Toast.LENGTH_SHORT).show()
                 }
                 mStartPlaying = !mStartPlaying
             } else {

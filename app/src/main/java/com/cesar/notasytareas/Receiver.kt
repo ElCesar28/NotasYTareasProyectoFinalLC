@@ -11,7 +11,10 @@ const val mensajeExtra2 = "messageExtra"
 class Receiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val notificationUtils = Notificacion(context)
-        val notification = notificationUtils.getNotificationBuilder(tituloExtra2).build()
+        val notification = intent.getStringExtra(tituloExtra2)
+            ?.let { notificationUtils.getNotificationBuilder(it,
+                intent.getStringExtra(mensajeExtra2)!!
+            ).build() }
         notificationUtils.getManager().notify(notificationID++, notification)
     }
 }

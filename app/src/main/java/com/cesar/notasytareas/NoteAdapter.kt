@@ -21,7 +21,6 @@ class NoteAdapter(var notes: List<Note>): RecyclerView.Adapter<NoteAdapter.ViewH
         var name : TextView
         var description : TextView
         var btn_delete: ImageView
-        var btn_edit : ImageView
         var dateCompleted: TextView
         var item: CardView
 
@@ -30,7 +29,6 @@ class NoteAdapter(var notes: List<Note>): RecyclerView.Adapter<NoteAdapter.ViewH
             name = v.findViewById(R.id.lblTitulo)
             description = v.findViewById(R.id.lblContenido)
             btn_delete = v.findViewById(R.id.btnDelete)
-            btn_edit = v.findViewById(R.id.btnEdit)
             dateCompleted = v.findViewById(R.id.lblFecha)
             item=v.findViewById(R.id.cardView)
         }

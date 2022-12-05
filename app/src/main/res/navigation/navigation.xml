@@ -80,5 +80,9 @@
         android:id="@+id/recordatorios"
         android:name="com.cesar.notasytareas.Recordatorios"
         android:label="fragment_recordatorios"
-        tools:layout="@layout/fragment_recordatorios" />
+        tools:layout="@layout/fragment_recordatorios" >
+        <action
+            android:id="@+id/action_recordatorios_to_listNote"
+            app:destination="@id/listNote" />
+    </fragment>
 </navigation>
